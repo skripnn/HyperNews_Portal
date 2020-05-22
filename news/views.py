@@ -23,7 +23,6 @@ class OneNews(View):
 
     def get_one_new(self, link):
         file_path = getattr(settings, 'NEWS_JSON_PATH')
-        print(file_path)
         with open(file_path) as json_file:
             file = json.load(json_file)
             for dict_news in file:
@@ -43,7 +42,22 @@ class AllNews(View):
         file_path = getattr(settings, 'NEWS_JSON_PATH')
         with open(file_path) as json_file:
             file = json.load(json_file)
-            new_dict = {'news': file}
-            # for dict_news in file:
-            #     new_dict[str(dict_news['link'])] = dict_news
-            return new_dict
+            dates = []
+            for dict_news in file:
+                date = dict_news['created'][:10]
+                int_date = int(date.replace('-', ''))
+                if date in dates:
+                    continue
+                dates.append(int_date)
+        dates.sort(reverse=True)
+
+        new_dict = {}
+        for date in dates:
+            key = f'{str(date)[:4]}-{str(date)[4:6]}-{str(date)[6:]}'
+            value = []
+            for dict_news in file:
+                if dict_news['created'][:10] == key:
+                    value.append((dict_news['link'], dict_news['title']))
+            new_dict[key] = dict(value)
+        result = {'news': new_dict}
+        return result

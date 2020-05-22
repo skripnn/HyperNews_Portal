@@ -1,9 +1,13 @@
 {% extends "news/base.html" %}
-{% block title %}
-{{ title }}
-{% endblock %}
 {% block content %}
-    {% for one_news in news %}
-        <div><a target="_blank" href="/news/{{ one_news.link }}">{{ one_news.title }}</a></div>
+    <h2>Hyper news</h2>
+    {% for date, dict in news.items %}
+        <h4>{{ date }}</h4>
+        <ul>
+        {% for link, news_title in dict.items %}
+            <li><a href="/news/{{ link }}/">{{ news_title }}</a></li>
+        {% endfor %}
+        </ul>
     {% endfor %}
+    <a href="/news/create/">Create News</a>
 {% endblock %}
