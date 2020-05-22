@@ -1,0 +1,21 @@
+{% extends "news/base.html" %}
+{% block title %}Create new one{% endblock %}
+{% block content %}
+    <h2>Hyper news</h2>
+    <form method="post">{% csrf_token %}
+        <p>Title</p>
+        <p>
+            <label>
+                <input name="title">
+            </label>
+        </p>
+        <p>Text</p>
+        <p>
+            <label>
+                <textarea name="text"></textarea>
+            </label>
+        </p>
+        <p><button type="submit">Create</button></p>
+    </form>
+    <a href="/news/">News</a>
+{% endblock %}

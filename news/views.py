@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.conf import settings
 import json
+from datetime import datetime
 
 
 class ComingSoon(View):
@@ -15,11 +16,9 @@ class Main(View):
 
 
 class OneNews(View):
-    template_name = 'news/one_news.html'
-
     def get(self, request, link):
         context = self.get_one_new(link)
-        return render(request, self.template_name, context=context)
+        return render(request, 'news/one_news.html', context=context)
 
     def get_one_new(self, link):
         file_path = getattr(settings, 'NEWS_JSON_PATH')
@@ -32,11 +31,9 @@ class OneNews(View):
 
 
 class AllNews(View):
-    template_name = 'news/all_news.html'
-
     def get(self, request):
         context = self.get_all_news()
-        return render(request, self.template_name, context=context)
+        return render(request, 'news/all_news.html', context=context)
 
     def get_all_news(self):
         file_path = getattr(settings, 'NEWS_JSON_PATH')
@@ -61,3 +58,28 @@ class AllNews(View):
             new_dict[key] = dict(value)
         result = {'news': new_dict}
         return result
+
+
+class CreateNews(View):
+    def get(self, request):
+        return render(request, 'news/create_news.html')
+
+    def post(self, request):
+        file_path = getattr(settings, 'NEWS_JSON_PATH')
+        with open(file_path) as json_file:
+            file = json.load(json_file)
+        links = [dic['link'] for dic in file]
+        link = max(links) + 1
+        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        title = request.POST.get('title')
+        text = request.POST.get('text')
+        dictionary = {'created': date,
+                      'text': text,
+                      'title': title,
+                      'link': link}
+        file.append(dictionary)
+
+        with open(file_path, 'w') as json_file:
+            json.dump(file, json_file)
+
+        return redirect('/news/')
