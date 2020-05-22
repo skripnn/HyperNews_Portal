@@ -1,0 +1,9 @@
+{% extends "news/base.html" %}
+{% block title %}
+{{ title }}
+{% endblock %}
+{% block content %}
+    {% for one_news in news %}
+        <div><a target="_blank" href="/news/{{ one_news.link }}">{{ one_news.title }}</a></div>
+    {% endfor %}
+{% endblock %}
