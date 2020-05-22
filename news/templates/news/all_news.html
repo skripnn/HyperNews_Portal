@@ -1,6 +1,10 @@
 {% extends "news/base.html" %}
 {% block content %}
     <h2>Hyper news</h2>
+    <form method="get">
+        <input name="q">
+        <button type="submit">Search</button>
+    </form>
     {% for date, dict in news.items %}
         <h4>{{ date }}</h4>
         <ul>

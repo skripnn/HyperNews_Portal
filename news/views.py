@@ -12,7 +12,7 @@ class ComingSoon(View):
 
 class Main(View):
     def get(self, request):
-        return render(request, 'news/main.html')
+        return redirect('news/')
 
 
 class OneNews(View):
@@ -32,20 +32,37 @@ class OneNews(View):
 
 class AllNews(View):
     def get(self, request):
-        context = self.get_all_news()
+        q = request.GET.get('q', None)
+        filter_news = None
+        if q is not None:
+            filter_news = self.search(q)
+        context = self.get_all_news(filter_news)
         return render(request, 'news/all_news.html', context=context)
 
-    def get_all_news(self):
+    def search(self, q):
         file_path = getattr(settings, 'NEWS_JSON_PATH')
         with open(file_path) as json_file:
             file = json.load(json_file)
-            dates = []
+            result = []
             for dict_news in file:
-                date = dict_news['created'][:10]
-                int_date = int(date.replace('-', ''))
-                if date in dates:
-                    continue
-                dates.append(int_date)
+                if q in dict_news['title'] or q in dict_news['text']:
+                    result.append(dict_news)
+        return result
+
+    def get_all_news(self, filter_news):
+        if filter_news is None:
+            file_path = getattr(settings, 'NEWS_JSON_PATH')
+            with open(file_path) as json_file:
+                file = json.load(json_file)
+        else:
+            file = filter_news
+        dates = []
+        for dict_news in file:
+            date = dict_news['created'][:10]
+            int_date = int(date.replace('-', ''))
+            if date in dates:
+                continue
+            dates.append(int_date)
         dates.sort(reverse=True)
 
         new_dict = {}
